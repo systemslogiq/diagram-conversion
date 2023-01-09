@@ -31,6 +31,12 @@ node -v
 imagemagick -v
 ```
 
+Make the `make_transparent.sh` script executable by running the following command:
+
+```bash
+chmod +x make_transparent.sh
+```
+
 ## Usage
 
 To use the application, you will need to set the following environment variables in a `.env` file located in the root directory of the project:

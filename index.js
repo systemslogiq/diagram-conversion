@@ -48,7 +48,7 @@ function convertToWebP(filePath) {
       );
 
       sharp(inputFile)
-        .webp()
+        .webp({ quality: 60, effort: 6 })
         .toFile(outputFile)
         .then(() => {
           console.log(`Successfully converted ${file} to ${outputFile}`);
