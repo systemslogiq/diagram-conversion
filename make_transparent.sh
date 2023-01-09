@@ -57,22 +57,3 @@ for file in $(find $path -maxdepth 1 -name "${startswith}*"); do
   fi
 done
 
-# for file in $(ls $path); do
-#   # Check if the file is an image file
-#   if file -b --mime-type "$path/$file" | grep -Eq "image/$image_extensions" && [[ $file == $startswith* ]]; then
-#     # Execute the convert command on the file
-#     convert "$path/$file" -fuzz 20% -alpha off -fill 'rgba(255,255,255,0)' -opaque white "$output/${file%.*}$suffix.${file##*.}"
-#     echo "creating $output/${file%.*}$suffix.${file##*.}..."
-#     # echo "$path/$file" | xargs -P $(sysctl -n hw.physicalcpu) -I {} convert "{}"  -fuzz 20% -alpha off -fill 'rgba(255,255,255,0)' -opaque white  "$output/${file%.*}$suffix.${file##*.}"
-#   fi
-# done
-
-# Loop through the list of files in the specified directory
-# for file in $(ls $path); do
-#   # Check if the file is a gif
-#   if [[ $file == *.gif ]]; then
-#     # Execute the convert command on the file
-#     convert "$path/$file" -fuzz 20% -alpha off -fill 'rgba(255,255,255,0)' -opaque white "$output/${file%.*}$suffix.${file##*.}"
-#     # convert "$path/$file" -fuzz 20% -alpha off -fill 'rgba(255,255,255,0)' -opaque white "$input/converted/${file%.*}$suffix.${file##*.}"
-#   fi
-# done
