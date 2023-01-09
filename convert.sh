@@ -3,15 +3,17 @@
 # Set the field separator to a newline character
 IFS=$'\n'
 
+source .env
+
 # Initialize the path and suffix variables
-input_path=""
-output_path=""
+input_path=$INPUT_PATH
+output_path=$OUTPUT_PATH
 suffix=""
-startswith="*"
+startswith=$PREFIX
 
 # Process the arguments
 # -i input path
-# -o output path
+# -o output_path path
 # -suffix suffix to append to the output file name
 while [ "$1" != "" ]; do
   case $1 in
@@ -53,7 +55,8 @@ for file in $(find $input_path -maxdepth 1 -name "${startswith}*"); do
   extension=${file##*.}
   if [[ "$extension" =~ $image_extensions ]]; then
     echo $file
-    convert "$file" -fuzz 20% -alpha off -fill 'rgba(255,255,255,0)' -opaque white "$output_path/${file_name%.*}$suffix.${file_name##*.}"
+    # convert "$file" -fuzz 20% -alpha off -fill 'rgba(255,255,255,0)' -opaque white "$output_path/${file_name%.*}$suffix.${file_name##*.}"
+    convert "$file" -fuzz 20% -alpha off -fill 'rgba(255,255,255,0)' -opaque white -quality 60% "$output_path/${file_name%.*}$suffix.webp"
   fi
 done
 
