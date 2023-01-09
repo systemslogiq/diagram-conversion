@@ -15,11 +15,11 @@ const cmd = spawn(path.resolve(__dirname, "make_transparent.sh"), [
 ]);
 
 cmd.stdout.on("data", (data) => {
-  console.log(`stdout: ${data}`);
+  console.log(`${data}`);
 });
 
 cmd.stderr.on("data", (data) => {
-  console.error(`stderr: ${data}`);
+  console.error(`ERROR: ${data}`);
 });
 
 cmd.on("close", (code) => {
