@@ -30,10 +30,55 @@ export class ImageConverter {
     let pipeline = sharp(inputPath);
 
     if (this.options.removeWhiteBg && shouldMakeTransparent) {
-      // Remove white background using Sharp's built-in flatten with transparent background
-      pipeline = pipeline
+      // First, we need to process the image to make white pixels transparent
+      // Sharp doesn't have a direct "make color transparent" function, so we'll use a different approach
+      
+      // Get image as raw pixel data
+      const { data, info } = await pipeline
         .ensureAlpha()
-        .flatten({ background: { r: 255, g: 255, b: 255, alpha: 0 } });
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      
+      // Convert to RGBA if needed
+      const channels = info.channels;
+      const pixelCount = info.width * info.height;
+      const newData = Buffer.alloc(pixelCount * 4); // RGBA
+      
+      const fuzz = this.options.transparencyFuzz * 2.55; // Convert percentage to 0-255 range
+      
+      for (let i = 0; i < pixelCount; i++) {
+        const srcOffset = i * channels;
+        const dstOffset = i * 4;
+        
+        const r = data[srcOffset];
+        const g = data[srcOffset + 1];
+        const b = data[srcOffset + 2];
+        const a = channels === 4 ? data[srcOffset + 3] : 255;
+        
+        // Check if pixel is close to white within fuzz threshold
+        if (r > 255 - fuzz && g > 255 - fuzz && b > 255 - fuzz) {
+          // Make it transparent
+          newData[dstOffset] = r;
+          newData[dstOffset + 1] = g;
+          newData[dstOffset + 2] = b;
+          newData[dstOffset + 3] = 0; // Transparent
+        } else {
+          // Keep original pixel
+          newData[dstOffset] = r;
+          newData[dstOffset + 1] = g;
+          newData[dstOffset + 2] = b;
+          newData[dstOffset + 3] = a;
+        }
+      }
+      
+      // Create new pipeline from processed data
+      pipeline = sharp(newData, {
+        raw: {
+          width: info.width,
+          height: info.height,
+          channels: 4
+        }
+      });
     }
 
     // Convert to target format
