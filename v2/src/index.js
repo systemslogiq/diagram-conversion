@@ -117,8 +117,14 @@ async function main() {
           }
         } catch (error) {
           errors.push({ file, error: error.message });
-          if (options.verbose && !options.json) {
-            console.log(chalk.red(`✗ ${path.basename(file)}: ${error.message}`));
+          if (progressBar) {
+            progressBar.update(index + 1, { filename: `ERROR: ${path.basename(file)}` });
+          }
+          if (!options.json) {
+            console.error(chalk.red(`✗ ${path.basename(file)}: ${error.message}`));
+            if (error.stack && options.verbose) {
+              console.error(chalk.gray(error.stack));
+            }
           }
         }
       })

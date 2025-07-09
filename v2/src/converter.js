@@ -20,6 +20,9 @@ export class ImageConverter {
       throw new Error(`Not a file: ${inputPath}`);
     }
 
+    // Ensure output directory exists
+    await fs.mkdir(outputPath, { recursive: true });
+
     const fileName = path.basename(inputPath);
     const nameWithoutExt = path.parse(fileName).name;
     const shouldMakeTransparent = this.shouldMakeTransparent(fileName);
@@ -27,39 +30,10 @@ export class ImageConverter {
     let pipeline = sharp(inputPath);
 
     if (this.options.removeWhiteBg && shouldMakeTransparent) {
-      // Remove white background by making it transparent
-      const metadata = await pipeline.metadata();
-      
-      if (!metadata.hasAlpha) {
-        pipeline = pipeline.ensureAlpha();
-      }
-
-      // Apply transparency to white pixels
-      pipeline = pipeline.raw().toBuffer(async (err, data, info) => {
-        if (err) throw err;
-
-        const pixels = new Uint8Array(data);
-        const fuzz = this.options.transparencyFuzz * 2.55; // Convert percentage to 0-255 range
-
-        for (let i = 0; i < pixels.length; i += info.channels) {
-          const r = pixels[i];
-          const g = pixels[i + 1];
-          const b = pixels[i + 2];
-
-          // Check if pixel is close to white within fuzz threshold
-          if (r > 255 - fuzz && g > 255 - fuzz && b > 255 - fuzz) {
-            pixels[i + 3] = 0; // Set alpha to 0 (transparent)
-          }
-        }
-
-        return sharp(pixels, {
-          raw: {
-            width: info.width,
-            height: info.height,
-            channels: info.channels
-          }
-        });
-      });
+      // Remove white background using Sharp's built-in flatten with transparent background
+      pipeline = pipeline
+        .ensureAlpha()
+        .flatten({ background: { r: 255, g: 255, b: 255, alpha: 0 } });
     }
 
     // Convert to target format
