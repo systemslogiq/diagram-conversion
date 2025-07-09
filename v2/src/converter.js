@@ -130,17 +130,15 @@ export class ImageConverter {
   }
 
   shouldMakeTransparent(fileName) {
-    // Check if filename indicates it's a level 3+ diagram (11 chars)
+    // Check if filename indicates it's a plant/line diagram (11 chars)
     const nameWithoutExt = path.parse(fileName).name;
     
     if (nameWithoutExt.length === 11) {
-      // This appears to be a plant/line diagram identifier
-      // Based on the git commit, only level 3+ should be transparent
-      // Without more context, we'll apply transparency to all 11-char files
-      return true;
+      // Plant/line diagrams should NOT have transparency applied
+      return false;
     }
     
-    return true; // Default: make transparent
+    return true; // Default: make transparent for all other files
   }
 
   async processDirectory(inputDir, outputDir, options = {}) {
